@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Learn" />
+  <meta name="application-name" content="Learn" />
+  <meta name="theme-color" content="#f7f3ea" />
+  <title>Little Learners · Colors</title>
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../shared/app.css" />
+  <style>
+    .grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: min(92vw, 520px, calc(100vh - 300px));
+      width: min(92vw, 520px, calc(100dvh - 300px));
+    }
+    @media (orientation: landscape) and (max-height: 560px) {
+      .grid { grid-template-columns: repeat(4, 1fr); width: min(94vw, calc((100dvh - 190px) * 4 + 36px)); }
+    }
+    .card {
+      aspect-ratio: 1; border-radius: 24px;
+      border: 3px solid #fff;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+      cursor: pointer; transition: transform 0.12s ease;
+      display: flex; flex-direction: column;
+      overflow: hidden; background: #fff; padding: 0; min-width: 0;
+    }
+    .card img {
+      width: 100%; flex: 1; object-fit: cover; object-position: center;
+      background: #eef1f3; min-height: 0; display: block;
+    }
+    .card .label {
+      font-size: clamp(0.85rem, 2.6vw, 1.05rem);
+      font-weight: 700; color: var(--ink);
+      text-align: center; line-height: 1.2;
+      padding: 8px 6px 10px; background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../" aria-label="Home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 0 0 1.3-1.5Z"/></svg>
+      <span id="homeLabel">Home</span>
+    </a>
+    <div class="brand" id="brand">Colors · 顏色</div>
+    <div class="controls">
+      <button class="chip active" id="langEN" type="button">EN</button>
+      <button class="chip" id="langZH" type="button">中文</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="prompt">
+      <p class="ask" id="ask">Tap the red apple</p>
+      <p class="sub" id="sub">紅色的蘋果</p>
+      <button class="speak" id="speak" type="button">🔊 Hear again</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>Real photos · match color · learn the name</footer>
+
+  <div class="celebrate" id="celebrate">
+    <div class="bubble">
+      <h2 id="yay">Great job!</h2>
+      <p id="yaySub">red apple · 紅色的蘋果</p>
+    </div>
+  </div>
+
+  <script src="../shared/app.js"></script>
+  <script>
+    const ITEMS = [
+      { id: "apple", img: "images/apple.jpg", colorEn: "red", colorZh: "紅色", en: "apple", zh: "蘋果" },
+      { id: "strawberry", img: "images/strawberry.jpg", colorEn: "red", colorZh: "紅色", en: "strawberry", zh: "草莓" },
+      { id: "firetruck", img: "images/firetruck.jpg", colorEn: "red", colorZh: "紅色", en: "fire truck", zh: "消防車" },
+      { id: "heart", img: "images/heart.jpg", colorEn: "red", colorZh: "紅色", en: "heart", zh: "愛心" },
+
+      { id: "blueberry", img: "images/blueberry.jpg", colorEn: "blue", colorZh: "藍色", en: "blueberry", zh: "藍莓" },
+      { id: "jeans", img: "images/jeans.jpg", colorEn: "blue", colorZh: "藍色", en: "jeans", zh: "牛仔褲" },
+      { id: "whale", img: "images/whale.jpg", colorEn: "blue", colorZh: "藍色", en: "whale", zh: "鯨魚" },
+      { id: "umbrella", img: "images/umbrella.jpg", colorEn: "blue", colorZh: "藍色", en: "umbrella", zh: "雨傘" },
+
+      { id: "banana", img: "images/banana.jpg", colorEn: "yellow", colorZh: "黃色", en: "banana", zh: "香蕉" },
+      { id: "sun", img: "images/sun.jpg", colorEn: "yellow", colorZh: "黃色", en: "sun", zh: "太陽" },
+      { id: "chick", img: "images/chick.jpg", colorEn: "yellow", colorZh: "黃色", en: "chick", zh: "小雞" },
+      { id: "taxi", img: "images/taxi.jpg", colorEn: "yellow", colorZh: "黃色", en: "taxi", zh: "計程車" },
+
+      { id: "broccoli", img: "images/broccoli.jpg", colorEn: "green", colorZh: "綠色", en: "broccoli", zh: "花椰菜" },
+      { id: "frog", img: "images/frog.jpg", colorEn: "green", colorZh: "綠色", en: "frog", zh: "青蛙" },
+      { id: "leaf", img: "images/leaf.jpg", colorEn: "green", colorZh: "綠色", en: "leaf", zh: "葉子" },
+      { id: "pear", img: "images/pear.jpg", colorEn: "green", colorZh: "綠色", en: "pear", zh: "梨子" },
+
+      { id: "orange", img: "images/orange.jpg", colorEn: "orange", colorZh: "橘色", en: "orange", zh: "橘子" },
+      { id: "carrot", img: "images/carrot.jpg", colorEn: "orange", colorZh: "橘色", en: "carrot", zh: "紅蘿蔔" },
+      { id: "pumpkin", img: "images/pumpkin.jpg", colorEn: "orange", colorZh: "橘色", en: "pumpkin", zh: "南瓜" },
+      { id: "basketball", img: "images/basketball.jpg", colorEn: "orange", colorZh: "橘色", en: "basketball", zh: "籃球" },
+
+      { id: "grapes", img: "images/grapes.jpg", colorEn: "purple", colorZh: "紫色", en: "grapes", zh: "葡萄" },
+      { id: "eggplant", img: "images/eggplant.jpg", colorEn: "purple", colorZh: "紫色", en: "eggplant", zh: "茄子" },
+      { id: "flower", img: "images/flower.jpg", colorEn: "purple", colorZh: "紫色", en: "flower", zh: "花" },
+    ];
+
+    let lang = LL.getLang();
+    let target = null;
+    let locked = false;
+    let round = 0;
+
+    const askEl = document.getElementById("ask");
+    const subEl = document.getElementById("sub");
+    const grid = document.getElementById("grid");
+    const celebrate = document.getElementById("celebrate");
+    const yay = document.getElementById("yay");
+    const yaySub = document.getElementById("yaySub");
+
+    function phrase(item) {
+      if (lang === "en") {
+        return {
+          ask: "Tap the " + item.colorEn + " " + item.en,
+          sub: item.colorZh + "的" + item.zh,
+          speak: "Tap the " + item.colorEn + " " + item.en,
+          win: "Yes! " + item.colorEn + " " + item.en,
+          winLine: item.colorEn + " " + item.en + " · " + item.colorZh + "的" + item.zh,
+        };
+      }
+      return {
+        ask: "點" + item.colorZh + "的" + item.zh,
+        sub: item.colorEn + " " + item.en,
+        speak: "點" + item.colorZh + "的" + item.zh,
+        win: "對了！" + item.colorZh + "的" + item.zh,
+        winLine: item.colorZh + "的" + item.zh + " · " + item.colorEn + " " + item.en,
+      };
+    }
+
+    function speak(text) { LL.speak(text, lang); }
+
+    function speakPrompt() {
+      if (!target) return;
+      speak(phrase(target).speak);
+    }
+
+    function updatePrompt() {
+      if (!target) return;
+      const p = phrase(target);
+      askEl.textContent = p.ask;
+      subEl.textContent = p.sub;
+      document.getElementById("speak").textContent = lang === "en" ? "🔊 Hear again" : "🔊 再說一次";
+      document.getElementById("homeLabel").textContent = lang === "en" ? "Home" : "首頁";
+      document.getElementById("brand").textContent = lang === "en" ? "Colors · 顏色" : "顏色 · Colors";
+      yay.textContent = lang === "en" ? "Great job!" : "好棒！";
+    }
+
+    function newRound() {
+      round++;
+      locked = false;
+      celebrate.classList.remove("show");
+      let next;
+      do { next = ITEMS[Math.floor(Math.random() * ITEMS.length)]; } while (target && next.id === target.id);
+      target = next;
+
+      const others = LL.shuffle(ITEMS.filter(i => i.id !== target.id));
+      const differentColor = others.filter(i => i.colorEn !== target.colorEn);
+      const sameColor = others.filter(i => i.colorEn === target.colorEn);
+      const picks = [...differentColor.slice(0, 3)];
+      while (picks.length < 3 && sameColor.length) picks.push(sameColor.shift());
+
+      const choices = LL.shuffle([target, ...picks.slice(0, 3)]);
+      grid.innerHTML = "";
+      choices.forEach(item => {
+        const b = document.createElement("button");
+        b.className = "card";
+        b.type = "button";
+        b.setAttribute("aria-label", lang === "en" ? item.en : item.zh);
+        b.innerHTML =
+          '<img src="' + item.img + '" alt="' + item.en + '" draggable="false" />' +
+          '<div class="label">' + (lang === "en" ? item.en : item.zh) + "</div>";
+        b.addEventListener("click", () => onPick(item, b));
+        grid.appendChild(b);
+      });
+      updatePrompt();
+      setTimeout(speakPrompt, 280);
+    }
+
+    function onPick(item, el) {
+      if (locked) return;
+      if (item.id === target.id) {
+        locked = true;
+        el.classList.add("correct");
+        const p = phrase(target);
+        yaySub.textContent = p.winLine;
+        celebrate.classList.add("show");
+        const r = round;
+        LL.afterPraise(p.win, lang, () => { if (r === round) newRound(); }, 1300);
+      } else {
+        el.classList.add("wrong");
+        setTimeout(() => el.classList.remove("wrong"), 350);
+      }
+    }
+
+    LL.bindLangToggle(l => { lang = l; if (target) newRound(); });
+    document.getElementById("speak").addEventListener("click", speakPrompt);
+    LL.onFirstTouch(speakPrompt);
+
+    newRound();
+  </script>
+</body>
+</html>

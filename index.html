@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-root="./">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Learn" />
+  <meta name="application-name" content="Learn" />
+  <meta name="theme-color" content="#f7f3ea" />
+  <title>Little Learners</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="shared/app.css" />
+  <style>
+    .brand { font-size: 1.3rem; text-align: left; }
+    main { gap: 18px; }
+    .hello { margin: 0; font-size: clamp(1.2rem, 3.6vw, 1.7rem); font-weight: 700; text-align: center; }
+    .tiles {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;
+      width: min(92vw, 640px, calc(100vh - 190px));
+      width: min(92vw, 640px, calc(100dvh - 190px));
+    }
+    @media (orientation: landscape) and (max-height: 560px) {
+      .tiles { grid-template-columns: repeat(4, 1fr); width: min(94vw, calc((100dvh - 150px) * 4 + 54px)); }
+    }
+    .tile {
+      position: relative; aspect-ratio: 1; border-radius: 28px;
+      border: 4px solid #fff; background: var(--card);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      text-decoration: none; color: var(--ink); padding: 10px;
+      transition: transform 0.12s ease;
+    }
+    .tile:active { transform: scale(0.96); }
+    .tile svg { width: 58%; height: auto; flex-shrink: 1; min-height: 0; }
+    .tile .t1 { font-size: clamp(1.15rem, 3.4vw, 1.7rem); font-weight: 800; line-height: 1.15; }
+    .tile .t2 { font-size: clamp(0.95rem, 2.6vw, 1.25rem); font-weight: 600; color: var(--muted); line-height: 1.15; }
+    .tile.soon { background: #fbf9f4; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
+    .tile.soon svg { opacity: 0.45; }
+    .tile.soon .t1, .tile.soon .t2 { opacity: 0.55; }
+    .tile .badge {
+      position: absolute; top: 10px; right: 10px;
+      background: var(--soft); color: var(--accent); border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; padding: 4px 9px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Little Learners</div>
+    <div class="controls">
+      <button class="chip active" id="langEN" type="button">EN</button>
+      <button class="chip" id="langZH" type="button">中文</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="hello" id="hello">Pick a game!</p>
+    <nav class="tiles" aria-label="Games">
+      <a class="tile" href="colors/" id="tColors">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="30" cy="30" r="20" fill="#ef4444"/>
+          <circle cx="70" cy="30" r="20" fill="#3b82f6"/>
+          <circle cx="30" cy="70" r="20" fill="#facc15"/>
+          <circle cx="70" cy="70" r="20" fill="#22c55e"/>
+        </svg>
+        <span class="t1">Colors</span><span class="t2">顏色</span>
+      </a>
+      <a class="tile" href="shapes/" id="tShapes">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="28" cy="28" r="20" fill="#ff5a5f"/>
+          <rect x="54" y="9" width="38" height="38" rx="4" fill="#3b82f6"/>
+          <polygon points="28,54 49,91 7,91" fill="#22c55e"/>
+          <polygon points="73.0,50.0 78.6,65.3 94.9,65.9 82.0,75.9 86.5,91.6 73.0,82.5 59.5,91.6 64.0,75.9 51.1,65.9 67.4,65.3" fill="#facc15"/>
+        </svg>
+        <span class="t1">Shapes</span><span class="t2">形狀</span>
+      </a>
+      <div class="tile soon" role="button" aria-disabled="true" tabindex="-1">
+        <span class="badge" data-en="Soon" data-zh="即將推出">Soon</span>
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <text x="50" y="66" text-anchor="middle" font-size="44" font-weight="800" font-family="-apple-system, sans-serif">
+            <tspan fill="#ef4444">A</tspan><tspan fill="#3b82f6">B</tspan><tspan fill="#22c55e">C</tspan>
+          </text>
+        </svg>
+        <span class="t1">ABC</span><span class="t2">英文字母</span>
+      </div>
+      <div class="tile soon" role="button" aria-disabled="true" tabindex="-1">
+        <span class="badge" data-en="Soon" data-zh="即將推出">Soon</span>
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <text x="50" y="64" text-anchor="middle" font-size="36" font-weight="800" font-family="-apple-system, 'PingFang TC', sans-serif">
+            <tspan fill="#a855f7">ㄅ</tspan><tspan fill="#f97316">ㄆ</tspan><tspan fill="#ec4899">ㄇ</tspan>
+          </text>
+        </svg>
+        <span class="t1">ㄅㄆㄇ</span><span class="t2">注音</span>
+      </div>
+    </nav>
+  </main>
+
+  <footer id="foot">Tap a game · 點一個遊戲</footer>
+
+  <script src="shared/app.js"></script>
+  <script>
+    var NAMES = {
+      tColors: { en: "Colors", zh: "顏色" },
+      tShapes: { en: "Shapes", zh: "形狀" }
+    };
+    function paint(lang) {
+      document.getElementById("hello").textContent = lang === "en" ? "Pick a game!" : "選一個遊戲！";
+      Object.keys(NAMES).forEach(function (id) {
+        var el = document.getElementById(id);
+        el.querySelector(".t1").textContent = NAMES[id][lang];
+        el.querySelector(".t2").textContent = NAMES[id][lang === "en" ? "zh" : "en"];
+      });
+      document.querySelectorAll(".badge").forEach(function (b) { b.textContent = b.getAttribute("data-" + lang); });
+    }
+    LL.bindLangToggle(paint);
+    paint(LL.getLang());
+    // "Coming soon" tiles just wiggle.
+    document.querySelectorAll(".tile.soon").forEach(function (t) {
+      t.addEventListener("click", function () {
+        t.classList.remove("wrong"); void t.offsetWidth; t.classList.add("wrong");
+        setTimeout(function () { t.classList.remove("wrong"); }, 350);
+      });
+    });
+  </script>
+</body>
+</html>

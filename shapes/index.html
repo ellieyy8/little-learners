@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Learn" />
+  <meta name="application-name" content="Learn" />
+  <meta name="theme-color" content="#f7f3ea" />
+  <title>Little Learners · Shapes</title>
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../shared/app.css" />
+  <style>
+    /* 3 cards in a row; card is 3:4, sized so the whole row fits the screen height. */
+    .grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      width: min(94vw, 860px, calc((100vh - 290px) * 2.25 + 32px));
+      width: min(94vw, 860px, calc((100dvh - 290px) * 2.25 + 32px));
+    }
+    .card {
+      aspect-ratio: 3 / 4; border-radius: 26px;
+      border: 3px solid #fff; background: #fff; padding: 0; min-width: 0;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+      cursor: pointer; transition: transform 0.12s ease;
+      display: flex; flex-direction: column; align-items: center;
+      overflow: hidden;
+    }
+    .card .shape {
+      flex: 1 1 auto; min-height: 0; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      padding: 7% 12% 3%;
+    }
+    .card .shape svg { width: 100%; height: 100%; display: block; }
+    .card .photo {
+      height: 34%; width: 100%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card .photo img {
+      height: 100%; max-width: 70%; object-fit: cover; display: block;
+      border-radius: 16px; background: #eef1f3;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+    @media (orientation: portrait) {
+      .card { aspect-ratio: 5 / 8; }
+      .card .photo { height: 40%; }
+      .grid {
+        width: min(94vw, 860px, calc((100vh - 290px) * 1.875 + 32px));
+        width: min(94vw, 860px, calc((100dvh - 290px) * 1.875 + 32px));
+      }
+    }
+    .card .label {
+      font-size: clamp(1rem, 2.8vw, 1.35rem);
+      font-weight: 800; color: var(--ink);
+      text-align: center; line-height: 1.2;
+      padding: 8px 6px 12px; flex-shrink: 0;
+    }
+    .celebrate .pair { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+    .celebrate .pair svg { width: 86px; height: 86px; }
+    .celebrate .pair img { height: 86px; max-width: 120px; object-fit: cover; border-radius: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../" aria-label="Home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 0 0 1.3-1.5Z"/></svg>
+      <span id="homeLabel">Home</span>
+    </a>
+    <div class="brand" id="brand">Shapes · 形狀</div>
+    <div class="controls">
+      <button class="chip active" id="langEN" type="button">EN</button>
+      <button class="chip" id="langZH" type="button">中文</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="prompt">
+      <p class="ask" id="ask">Tap the circle</p>
+      <p class="sub" id="sub">點圓形</p>
+      <button class="speak" id="speak" type="button">🔊 Hear again</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>Find the shape · see it in real life</footer>
+
+  <div class="celebrate" id="celebrate">
+    <div class="bubble">
+      <div class="pair" id="yayPair"></div>
+      <h2 id="yay">Great job!</h2>
+      <p id="yaySub">circle, like a ball · 圓形，像球一樣</p>
+    </div>
+  </div>
+
+  <script src="../shared/app.js"></script>
+  <script>
+    // Solid shapes, drawn in a 100x100 box.
+    const SVG = {
+      circle: '<circle cx="50" cy="50" r="45"/>',
+      square: '<rect x="8" y="8" width="84" height="84" rx="5"/>',
+      triangle: '<polygon points="50,7 96,90 4,90" stroke-linejoin="round"/>',
+      rectangle: '<rect x="24" y="2" width="52" height="96" rx="4"/>',
+      star: '<polygon points="50.0,6.0 61.2,37.6 94.7,38.5 68.1,58.9 77.6,91.0 50.0,72.0 22.4,91.0 31.9,58.9 5.3,38.5 38.8,37.6"/>',
+      heart: '<path d="M50 90 C 22 70 3 52 3 31 C 3 16 14 6 28 6 C 38 6 46 12 50 21 C 54 12 62 6 72 6 C 86 6 97 16 97 31 C 97 52 78 70 50 90 Z"/>',
+    };
+
+    const SHAPES = [
+      { id: "circle",    color: "#ff5a5f", en: "circle",    zh: "圓形",   img: "images/ball.jpg",       objEn: "a ball",              objZh: "球一樣",         alt: "ball" },
+      { id: "square",    color: "#3b82f6", en: "square",    zh: "正方形", img: "images/window.jpg",     objEn: "a window",            objZh: "窗戶一樣",       alt: "window" },
+      { id: "triangle",  color: "#22c55e", en: "triangle",  zh: "三角形", img: "images/watermelon.jpg", objEn: "a slice of watermelon", objZh: "一片西瓜",     alt: "slice of watermelon" },
+      { id: "rectangle", color: "#a855f7", en: "rectangle", zh: "長方形", img: "images/door.jpg",       objEn: "a door",              objZh: "門一樣",         alt: "door" },
+      { id: "star",      color: "#f5b800", en: "star",      zh: "星形",   img: "images/star.jpg",       objEn: "a star on a tree",    objZh: "樹上的星星",     alt: "star decoration" },
+      { id: "heart",     color: "#ec4899", en: "heart",     zh: "愛心",   img: "images/heart.jpg",      objEn: "a heart balloon",     objZh: "愛心氣球",       alt: "heart balloon" },
+    ];
+
+    function shapeSVG(s) {
+      return '<svg viewBox="0 0 100 100" aria-hidden="true" fill="' + s.color + '">' + SVG[s.id] + "</svg>";
+    }
+    const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+
+    let lang = LL.getLang();
+    let target = null;
+    let locked = false;
+    let round = 0;
+
+    const askEl = document.getElementById("ask");
+    const subEl = document.getElementById("sub");
+    const grid = document.getElementById("grid");
+    const celebrate = document.getElementById("celebrate");
+    const yay = document.getElementById("yay");
+    const yaySub = document.getElementById("yaySub");
+    const yayPair = document.getElementById("yayPair");
+
+    function phrase(s) {
+      const enLike = cap(s.en) + ", like " + s.objEn;
+      const zhLike = s.zh + "，像" + s.objZh;
+      if (lang === "en") {
+        return { ask: "Tap the " + s.en, sub: "點" + s.zh, speak: "Tap the " + s.en,
+                 win: "Yes! " + enLike, winLine: enLike + " · " + zhLike };
+      }
+      return { ask: "點" + s.zh, sub: "Tap the " + s.en, speak: "點" + s.zh,
+               win: "對了！" + zhLike, winLine: zhLike + " · " + enLike };
+    }
+
+    function speak(text) { LL.speak(text, lang); }
+    function speakPrompt() { if (target) speak(phrase(target).speak); }
+
+    function updatePrompt() {
+      if (!target) return;
+      const p = phrase(target);
+      askEl.textContent = p.ask;
+      subEl.textContent = p.sub;
+      document.getElementById("speak").textContent = lang === "en" ? "🔊 Hear again" : "🔊 再說一次";
+      document.getElementById("homeLabel").textContent = lang === "en" ? "Home" : "首頁";
+      document.getElementById("brand").textContent = lang === "en" ? "Shapes · 形狀" : "形狀 · Shapes";
+      yay.textContent = lang === "en" ? "Great job!" : "好棒！";
+    }
+
+    function newRound() {
+      round++;
+      locked = false;
+      celebrate.classList.remove("show");
+      let next;
+      do { next = SHAPES[Math.floor(Math.random() * SHAPES.length)]; } while (target && next.id === target.id);
+      target = next;
+
+      const others = LL.shuffle(SHAPES.filter(s => s.id !== target.id)).slice(0, 2);
+      const choices = LL.shuffle([target, ...others]);
+      grid.innerHTML = "";
+      choices.forEach(s => {
+        const b = document.createElement("button");
+        b.className = "card";
+        b.type = "button";
+        b.setAttribute("aria-label", lang === "en" ? s.en : s.zh);
+        b.innerHTML =
+          '<div class="shape">' + shapeSVG(s) + "</div>" +
+          '<div class="photo"><img src="' + s.img + '" alt="' + s.alt + '" draggable="false" /></div>' +
+          '<div class="label">' + (lang === "en" ? s.en : s.zh) + "</div>";
+        b.addEventListener("click", () => onPick(s, b));
+        grid.appendChild(b);
+      });
+      updatePrompt();
+      setTimeout(speakPrompt, 280);
+    }
+
+    function onPick(s, el) {
+      if (locked) return;
+      if (s.id === target.id) {
+        locked = true;
+        el.classList.add("correct");
+        const p = phrase(target);
+        yayPair.innerHTML = shapeSVG(target) + '<img src="' + target.img + '" alt="" />';
+        yaySub.textContent = p.winLine;
+        celebrate.classList.add("show");
+        const r = round;
+        LL.afterPraise(p.win, lang, () => { if (r === round) newRound(); }, 1500);
+      } else {
+        el.classList.add("wrong");
+        setTimeout(() => el.classList.remove("wrong"), 350);
+      }
+    }
+
+    LL.bindLangToggle(l => { lang = l; if (target) newRound(); });
+    document.getElementById("speak").addEventListener("click", speakPrompt);
+    LL.onFirstTouch(speakPrompt);
+
+    newRound();
+  </script>
+</body>
+</html>
