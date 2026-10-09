@@ -29,36 +29,39 @@ so it comes from Teacher's Colors set (see above) and may be AI-generated/edited
 
 ## ABC game (`abc/images/`)
 
-All six are real photos (not AI-generated), CC0 or public domain, found with the
+Five of the six are real photos (not AI-generated), CC0 or public domain, found with the
 [Openverse](https://openverse.org) API (`license=cc0,pdm`) and the Wikimedia Commons API and
-picked from contact sheets. None of the Colors photos are reused here.
+picked from contact sheets. The sun is the exception: so that the same word always gets the
+same picture, the game uses Teacher's Colors photo `colors/images/sun.jpg` directly (see the
+Colors section above; it may be AI-generated/edited).
 
 | File | Word | Photo | Creator | License | Source |
 |---|---|---|---|---|---|
 | `apple.jpg` | A apple | "Closeup on red apple on white background" | (not named on rawpixel) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://www.rawpixel.com/image/6037410/photo-image-background-public-domain-fruit |
 | `ball.jpg` | B ball | "Soccer ball on ground" | Petey21 | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://commons.wikimedia.org/wiki/File:Soccer_ball_on_ground.jpg |
 | `moon.jpg` | M moon | "Full moon in Sagittarius" | Joselodos | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://commons.wikimedia.org/wiki/File:Full_moon_in_Sagittarius.jpg |
-| `sun.jpg` | S sun | "SDO 20180214 000000 4096 HMIIC (HMI)" (the Sun in visible light) | NASA/SDO and the AIA, EVE, and HMI science teams | Public domain (NASA) | https://commons.wikimedia.org/wiki/File:SDO_20180214_000000_4096_HMIIC_(HMI).jpg |
+| `../colors/images/sun.jpg` | S sun | Yellow sun in blue sky (same file as the Colors game) | Teacher (Colors set) | Teacher's photo; may be AI-generated/edited | — |
 | `pig.jpg` | P pig | Pink pig standing in a muddy field | (not named on rawpixel) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://www.rawpixel.com/image/6053919/free-public-domain-cc0-photo |
 | `dog.jpg` | D dog | "Puppy Dog on White" | George Hodan (publicdomainpictures.net) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://commons.wikimedia.org/wiki/File:Puppy_Dog_on_White.jpg |
 
 ## ㄅㄆㄇ game (`bopomofo/images/`)
 
-All six are real photos (not AI-generated), CC0 or public domain, found the same way. A real
-grapes photo was used, so the Colors grapes photo is not reused here.
+Five of the six are real photos (not AI-generated), CC0 or public domain, found the same way.
+The grapes are the exception: the game uses Teacher's Colors photo `colors/images/grapes.jpg`
+directly (purple bunch; may be AI-generated/edited), so 葡萄 looks the same in both games.
 
 | File | Word | Photo | Creator | License | Source |
 |---|---|---|---|---|---|
 | `cup.jpg` | ㄅ 杯子 cup | "Coffee - Massachusetts" (red mug) | Daderot | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://commons.wikimedia.org/wiki/File:Coffee_-_Massachusetts.jpg |
-| `grapes.jpg` | ㄆ 葡萄 grapes | "Free green grapes on white background" | (not named on rawpixel) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://www.rawpixel.com/image/5919560/photo-image-public-domain-plant-green |
+| `../colors/images/grapes.jpg` | ㄆ 葡萄 grapes | Purple grapes (same file as the Colors game) | Teacher (Colors set) | Teacher's photo; may be AI-generated/edited | — |
 | `cat.jpg` | ㄇ 貓 cat | "Project 366 #263: 190920 It Starts With A B…" (ginger kitten) | comedy_nose | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://www.flickr.com/photos/23408922@N07/50361206711 |
 | `airplane.jpg` | ㄈ 飛機 airplane | "DC-8 Airborne Laboratory in flight (EC98-44428-004)" | NASA Armstrong Flight Research Center / Carla Thomas | Public domain (NASA) | https://commons.wikimedia.org/wiki/File:DC-8_Airborne_Laboratory_in_flight_(EC98-44428-004).jpg |
 | `egg.jpg` | ㄉ 蛋 egg | "Egg upright" | Paolo Neo | Public domain | https://commons.wikimedia.org/wiki/File:Egg_upright.jpg |
 | `rabbit.jpg` | ㄊ 兔子 rabbit | "Cute rabbit on white background" | (not named on rawpixel) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | https://www.rawpixel.com/image/6033281/photo-image-public-domain-nature-cute |
 
-ABC and ㄅㄆㄇ photos were cropped to 4:3 (white or black padding added where needed; the
-caption text on the NASA Sun image was blacked out), resized to 800×600 and saved as JPEG
-quality 80.
+The ABC and ㄅㄆㄇ photos in `abc/images/` and `bopomofo/images/` were cropped to 4:3 (white
+padding added where needed), resized to 800×600 and saved as JPEG quality 80. The two Colors
+photos are used unchanged; the card crops them to 4:3 on screen.
 
 ## Icons and shapes
 
