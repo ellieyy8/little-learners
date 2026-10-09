@@ -91,7 +91,7 @@
     <div class="bubble">
       <div class="pair" id="yayPair"></div>
       <h2 id="yay">Great job!</h2>
-      <p id="yaySub">circle, like a ball · 圓形，像球一樣</p>
+      <p id="yaySub">circle, like a clock · 圓形，像時鐘一樣</p>
     </div>
   </div>
 
@@ -107,17 +107,33 @@
       heart: '<path d="M50 90 C 22 70 3 52 3 31 C 3 16 14 6 28 6 C 38 6 46 12 50 21 C 54 12 62 6 72 6 C 86 6 97 16 97 31 C 97 52 78 70 50 90 Z"/>',
     };
 
-    const SHAPES = [
-      { id: "circle",    color: "#ff5a5f", en: "circle",    zh: "圓形",   img: "images/ball.jpg",       objEn: "a ball",              objZh: "球一樣",         alt: "ball" },
-      { id: "square",    color: "#3b82f6", en: "square",    zh: "正方形", img: "images/window.jpg",     objEn: "a window",            objZh: "窗戶一樣",       alt: "window" },
-      { id: "triangle",  color: "#22c55e", en: "triangle",  zh: "三角形", img: "images/watermelon.jpg", objEn: "a slice of watermelon", objZh: "一片西瓜",     alt: "slice of watermelon" },
-      { id: "rectangle", color: "#a855f7", en: "rectangle", zh: "長方形", img: "images/door.jpg",       objEn: "a door",              objZh: "門一樣",         alt: "door" },
-      { id: "star",      color: "#f5b800", en: "star",      zh: "星形",   img: "images/star.jpg",       objEn: "a star on a tree",    objZh: "樹上的星星",     alt: "star decoration" },
-      { id: "heart",     color: "#ec4899", en: "heart",     zh: "愛心",   img: "images/heart.jpg",      objEn: "a heart balloon",     objZh: "愛心氣球",       alt: "heart balloon" },
+const SHAPES = [
+      { id: "circle",    en: "circle",    zh: "圓形",   img: "images/clock.jpg",      objEn: "a clock",               objZh: "時鐘一樣",   alt: "clock" },
+      { id: "square",    en: "square",    zh: "正方形", img: "images/cracker.jpg",    objEn: "a cracker",             objZh: "餅乾一樣",   alt: "square cracker" },
+      { id: "triangle",  en: "triangle",  zh: "三角形", img: "images/watermelon.jpg", objEn: "a slice of watermelon", objZh: "一片西瓜",   alt: "slice of watermelon" },
+      { id: "rectangle", en: "rectangle", zh: "長方形", img: "images/door.jpg",       objEn: "a door",                objZh: "門一樣",     alt: "door" },
+      { id: "star",      en: "star",      zh: "星形",   img: "images/star.jpg",       objEn: "a paper star",          objZh: "紙星星一樣", alt: "paper star" },
+      { id: "heart",     en: "heart",     zh: "愛心",   img: "images/heart.jpg",      objEn: "a heart balloon",       objZh: "愛心氣球",   alt: "heart balloon" },
     ];
+    // Color is not a cue: every round uses ONE bright color for all shapes (and the celebration),
+    // picked at random and never the same as the round before.
+    const PALETTE = [
+      { id: "red",    hex: "#ef4444" },
+      { id: "blue",   hex: "#3b82f6" },
+      { id: "yellow", hex: "#f5b800" },
+      { id: "green",  hex: "#22c55e" },
+      { id: "orange", hex: "#f97316" },
+      { id: "purple", hex: "#a855f7" },
+    ];
+    let roundColor = null;
+    function pickColor() {
+      const options = PALETTE.filter(c => !roundColor || c.id !== roundColor.id);
+      roundColor = options[Math.floor(Math.random() * options.length)];
+      grid.dataset.color = roundColor.id;
+    }
 
     function shapeSVG(s) {
-      return '<svg viewBox="0 0 100 100" aria-hidden="true" fill="' + s.color + '">' + SVG[s.id] + "</svg>";
+      return '<svg viewBox="0 0 100 100" aria-hidden="true" fill="' + roundColor.hex + '">' + SVG[s.id] + "</svg>";
     }
     const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
 
@@ -166,6 +182,7 @@
       let next;
       do { next = SHAPES[Math.floor(Math.random() * SHAPES.length)]; } while (target && next.id === target.id);
       target = next;
+      pickColor();
 
       const others = LL.shuffle(SHAPES.filter(s => s.id !== target.id)).slice(0, 2);
       const choices = LL.shuffle([target, ...others]);
