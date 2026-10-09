@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Learn" />
+  <meta name="application-name" content="Learn" />
+  <meta name="theme-color" content="#f7f3ea" />
+  <title>Little Learners · ABC</title>
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../shared/app.css" />
+  <link rel="stylesheet" href="../shared/letters.css" />
+</head>
+<body>
+  <header>
+    <a class="home" href="../" aria-label="Home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 0 0 1.3-1.5Z"/></svg>
+      <span id="homeLabel">Home</span>
+    </a>
+    <div class="brand" id="brand">ABC · 英文字母</div>
+    <div class="controls">
+      <button class="chip active" id="langEN" type="button">EN</button>
+      <button class="chip" id="langZH" type="button">中文</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="prompt">
+      <p class="ask" id="ask"></p>
+      <p class="sub" id="sub"></p>
+      <button class="speak" id="speak" type="button">🔊 Hear again</button>
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="grid" id="grid" data-n="2"></div>
+  </main>
+
+  <footer id="foot"></footer>
+
+  <div class="celebrate" id="celebrate">
+    <div class="bubble">
+      <div class="pair" id="yayPair"></div>
+      <h2 id="yay">Great job!</h2>
+      <p id="yaySub"></p>
+    </div>
+  </div>
+
+  <div class="done" id="done" role="dialog" aria-labelledby="doneTitle">
+    <div class="bubble">
+      <div class="stars" id="doneStars"></div>
+      <h2 id="doneTitle">All done!</h2>
+      <p id="doneSub">You found them all!</p>
+      <div class="actions">
+        <button class="again" id="again" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+          <span id="againLabel">Play again</span>
+        </button>
+        <a class="gohome" id="doneHome" href="../">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 0 0 1.3-1.5Z"/></svg>
+          <span id="doneHomeLabel">Home</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/app.js"></script>
+  <script src="../shared/letters.js"></script>
+  <script>
+    // ===================== SETTINGS (see README) =====================
+    // false (default): say the letter name, then the word:      "B ... ball"
+    // true:            say letter name, its sound twice, word:  "B ... buh, buh, ball"
+    // Text-to-speech can garble a lone sound, so check on the iPad before turning this on.
+    // For a quick test without editing: open abc/?sounds=1 (or ?sounds=0).
+    var USE_LETTER_SOUNDS = false;
+    // name:    how the letter name is written for the speech engine
+    // phoneme: the letter's sound, written so the voice says it well (only used when sounds are on)
+    // usePhoneme (optional): true/false overrides USE_LETTER_SOUNDS for that one letter
+    var LETTERS = [
+      { id: "a", big: "Aa", name: "A", phoneme: "aah", word: "apple", img: "images/apple.jpg", alt: "red apple" },
+      { id: "b", big: "Bb", name: "B", phoneme: "buh", word: "ball",  img: "images/ball.jpg",  alt: "soccer ball" },
+      { id: "m", big: "Mm", name: "M", phoneme: "mmm", word: "moon",  img: "images/moon.jpg",  alt: "full moon" },
+      { id: "s", big: "Ss", name: "S", phoneme: "sss", word: "sun",   img: "images/sun.jpg",   alt: "the sun" },
+      { id: "p", big: "Pp", name: "P", phoneme: "puh", word: "pig",   img: "images/pig.jpg",   alt: "pig" },
+      { id: "d", big: "Dd", name: "D", phoneme: "duh", word: "dog",   img: "images/dog.jpg",   alt: "puppy" },
+    ];
+    // ==================================================================
+    var q = new URLSearchParams(location.search).get("sounds");
+    if (q === "1" || q === "0") USE_LETTER_SOUNDS = q === "1";
+
+    function spoken(l) {
+      var useSound = (typeof l.usePhoneme === "boolean" ? l.usePhoneme : USE_LETTER_SOUNDS) && l.phoneme;
+      return useSound ? l.name + " ... " + l.phoneme + ", " + l.phoneme + ", " + l.word
+                      : l.name + " ... " + l.word;
+    }
+    window.ABC_SPOKEN = spoken; // used by the tests
+
+    LL.letterGame({
+      items: LETTERS,
+      speechLang: "en",              // ABC speech is always English
+      brand: { en: "ABC · 英文字母", zh: "英文字母 · ABC" },
+      foot: { en: "Find the letter · see a word that starts with it", zh: "找字母 · 看看用它開頭的東西" },
+      ask: function (l, ui) {
+        var U = l.big.charAt(0);
+        return ui === "en" ? { ask: "Find " + U, sub: "找 " + U } : { ask: "找 " + U, sub: "Find " + U };
+      },
+      say: spoken,
+      praise: function (l) { return "Yes! " + spoken(l); },
+      line: function (l) { return l.big + " · " + l.word; },
+      doneSay: "All done! Great job!",
+    });
+  </script>
+</body>
+</html>

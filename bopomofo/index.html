@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Learn" />
+  <meta name="application-name" content="Learn" />
+  <meta name="theme-color" content="#f7f3ea" />
+  <title>Little Learners · ㄅㄆㄇ</title>
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../shared/app.css" />
+  <link rel="stylesheet" href="../shared/letters.css" />
+</head>
+<body>
+  <header>
+    <a class="home" href="../" aria-label="Home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 0 0 1.3-1.5Z"/></svg>
+      <span id="homeLabel">Home</span>
+    </a>
+    <div class="brand" id="brand">ㄅㄆㄇ · 注音</div>
+    <div class="controls">
+      <button class="chip active" id="langEN" type="button">EN</button>
+      <button class="chip" id="langZH" type="button">中文</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="prompt">
+      <p class="ask" id="ask"></p>
+      <p class="sub" id="sub"></p>
+      <button class="speak" id="speak" type="button">🔊 Hear again</button>
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="grid" id="grid" data-n="2"></div>
+  </main>
+
+  <footer id="foot"></footer>
+
+  <div class="celebrate" id="celebrate">
+    <div class="bubble">
+      <div class="pair" id="yayPair"></div>
+      <h2 id="yay">Great job!</h2>
+      <p id="yaySub"></p>
+    </div>
+  </div>
+
+  <div class="done" id="done" role="dialog" aria-labelledby="doneTitle">
+    <div class="bubble">
+      <div class="stars" id="doneStars"></div>
+      <h2 id="doneTitle">All done!</h2>
+      <p id="doneSub">You found them all!</p>
+      <div class="actions">
+        <button class="again" id="again" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+          <span id="againLabel">Play again</span>
+        </button>
+        <a class="gohome" id="doneHome" href="../">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 0 0 1.3-1.5Z"/></svg>
+          <span id="doneHomeLabel">Home</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/app.js"></script>
+  <script src="../shared/letters.js"></script>
+  <script>
+    // ===================== SETTINGS (see README) =====================
+    // true (default): say the symbol, then the word:  "ㄅ，杯子"
+    // false:          say only the word (each symbol's "fallback"):  "杯子"
+    // Check on the iPad that the zh-TW voice reads the lone symbol correctly; if it doesn't,
+    // set this to false. For a quick test without editing: open bopomofo/?symbol=0 (or ?symbol=1).
+    var SPEAK_SYMBOL = true;
+    // fallback: what to say instead when the symbol is not spoken (just the word, never a
+    //           syllable like 玻 for ㄅ).
+    // speakSymbol (optional): true/false overrides SPEAK_SYMBOL for that one symbol, e.g. if
+    //           only ㄈ is misread, give ㄈ speakSymbol: false.
+    var SYMBOLS = [
+      { id: "b", big: "ㄅ", word: "杯子", fallback: "杯子", en: "cup",      img: "images/cup.jpg",      alt: "red cup" },
+      { id: "p", big: "ㄆ", word: "葡萄", fallback: "葡萄", en: "grapes",   img: "images/grapes.jpg",   alt: "grapes" },
+      { id: "m", big: "ㄇ", word: "貓",   fallback: "貓",   en: "cat",      img: "images/cat.jpg",      alt: "cat" },
+      { id: "f", big: "ㄈ", word: "飛機", fallback: "飛機", en: "airplane", img: "images/airplane.jpg", alt: "airplane" },
+      { id: "d", big: "ㄉ", word: "蛋",   fallback: "蛋",   en: "egg",      img: "images/egg.jpg",      alt: "egg" },
+      { id: "t", big: "ㄊ", word: "兔子", fallback: "兔子", en: "rabbit",   img: "images/rabbit.jpg",   alt: "rabbit" },
+    ];
+    // ==================================================================
+    var q = new URLSearchParams(location.search).get("symbol");
+    if (q === "1" || q === "0") SPEAK_SYMBOL = q === "1";
+
+    function useSymbol(s) { return typeof s.speakSymbol === "boolean" ? s.speakSymbol : SPEAK_SYMBOL; }
+    function spoken(s) { return useSymbol(s) ? s.big + "，" + s.word : s.fallback; }
+    window.BPMF_SPOKEN = spoken; // used by the tests
+
+    LL.letterGame({
+      items: SYMBOLS,
+      speechLang: "zh",              // 注音 speech is always zh-TW
+      symClass: "zy",
+      brand: { en: "ㄅㄆㄇ · Zhuyin", zh: "ㄅㄆㄇ · 注音" },
+      foot: { en: "Find the symbol · see a word that starts with it", zh: "找注音 · 看看用它開頭的東西" },
+      ask: function (s, ui) {
+        return ui === "en" ? { ask: "Find " + s.big, sub: "找 " + s.big } : { ask: "找 " + s.big, sub: "Find " + s.big };
+      },
+      say: spoken,
+      praise: function (s) { return "對了！" + spoken(s); },
+      line: function (s) { return s.big + " · " + s.word + " · " + s.en; },
+      doneSay: "全部完成！好棒！",
+    });
+  </script>
+</body>
+</html>

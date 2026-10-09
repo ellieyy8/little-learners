@@ -1,0 +1,73 @@
+/* Letter games (ABC, ㄅㄆㄇ): big symbol + photo cards, 2 or 3 per round. */
+.grid {
+  --n: 2;
+  display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 18px;
+  /* Cards are 3:4; size the row so it fits the screen height. */
+  width: min(94vw, calc(330px * var(--n) + 18px * (var(--n) - 1)), calc((100vh - 280px) * 0.75 * var(--n) + 18px * (var(--n) - 1)));
+  width: min(94vw, calc(330px * var(--n) + 18px * (var(--n) - 1)), calc((100dvh - 280px) * 0.75 * var(--n) + 18px * (var(--n) - 1)));
+}
+.grid[data-n="3"] { --n: 3; }
+.card {
+  aspect-ratio: 3 / 4; border-radius: 28px; min-width: 0;
+  border: 3px solid #fff; background: #fff; padding: 0;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+  cursor: pointer; transition: transform 0.12s ease;
+  display: flex; flex-direction: column; align-items: center; overflow: hidden;
+  container-type: inline-size; color: var(--ink);
+}
+.card .sym {
+  flex: 1 1 auto; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; line-height: 1; letter-spacing: 0.02em;
+  font-size: 18vmin; font-size: 36cqw;
+  font-family: "Avenir Next", "Avenir", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+.card .sym.one { font-size: 18vmin; font-size: 40cqw; }
+.card .sym.zy { font-family: "PingFang TC", "Heiti TC", "Noto Sans CJK TC", "Noto Sans TC", sans-serif; }
+.card .photo { width: 88%; flex-shrink: 0; }
+.card .photo img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
+  border-radius: 18px; background: #eef1f3;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+.card .word {
+  font-size: 7.5cqw; font-weight: 700; color: var(--muted);
+  padding: 2.5cqw 4px 4cqw; line-height: 1.15; flex-shrink: 0;
+}
+@media (orientation: portrait) {
+  .grid {
+    width: min(94vw, calc(360px * var(--n) + 18px * (var(--n) - 1)), calc((100vh - 300px) * 0.625 * var(--n) + 18px * (var(--n) - 1)));
+    width: min(94vw, calc(360px * var(--n) + 18px * (var(--n) - 1)), calc((100dvh - 300px) * 0.625 * var(--n) + 18px * (var(--n) - 1)));
+  }
+  .card { aspect-ratio: 5 / 8; }
+  .card .sym { font-size: 40cqw; }
+  .card .sym.one { font-size: 54cqw; }
+}
+.progress { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+.progress span { width: 22px; height: 22px; display: inline-block; }
+.progress svg { width: 100%; height: 100%; display: block; }
+.celebrate .pair { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 10px; }
+.celebrate .pair .bigsym { font-size: 84px; font-weight: 800; line-height: 1; color: var(--ink); }
+.celebrate .pair img { height: 96px; width: 128px; object-fit: cover; border-radius: 14px; }
+.done { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  background: rgba(247,243,234,0.92); z-index: 20; }
+.done.show { display: flex; }
+.done .bubble {
+  background: #fff; border-radius: 32px; padding: 30px 40px; text-align: center;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.1); max-width: 92vw; animation: pop 0.5s ease;
+}
+.done .stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
+.done .stars svg { width: 54px; height: 54px; animation: pop 0.6s ease both; }
+.done h2 { margin: 6px 0 4px; font-size: 2.4rem; color: var(--accent); }
+.done p { margin: 0 0 18px; color: var(--muted); font-size: 1.15rem; }
+.done .actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.done .actions button, .done .actions a {
+  min-height: 64px; padding: 12px 26px; border-radius: 999px; border: none;
+  font-size: 1.3rem; font-weight: 800; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.done .again { background: var(--accent); color: #fff; box-shadow: 0 6px 16px rgba(47,111,94,0.25); }
+.done .gohome { background: var(--soft); color: var(--accent); }
+.done .actions svg { width: 26px; height: 26px; }
+/* Keep Home and the EN/中文 toggle usable on top of the All done screen. */
+header { position: relative; z-index: 30; }
