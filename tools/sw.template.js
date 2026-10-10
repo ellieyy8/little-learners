@@ -67,16 +67,18 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
-    const hit = await cache.match(req, { ignoreSearch: true });
+    // ignoreVary: GitHub Pages sends "Vary: Accept-Encoding", and media requests use a different
+    // Accept-Encoding than the precache fetch, which would otherwise miss the cached clip.
+    const hit = await cache.match(req, { ignoreSearch: true, ignoreVary: true });
     if (hit) {
       const range = req.headers.get("range");
       return range ? rangeResponse(hit, range) : hit;
     }
     if (req.mode === "navigate") {
       if (url.pathname.endsWith("/")) {
-        const idx = await cache.match(url.pathname + "index.html");
+        const idx = await cache.match(url.pathname + "index.html", { ignoreVary: true });
         if (idx) return idx;
-      } else if (await cache.match(url.pathname + "/")) {
+      } else if (await cache.match(url.pathname + "/", { ignoreVary: true })) {
         // "/colors" -> "/colors/" (like the web server does), so relative links keep working offline
         return Response.redirect(url.pathname + "/" + url.search, 301);
       }
@@ -89,7 +91,7 @@ self.addEventListener("fetch", (event) => {
       return res;
     } catch (err) {
       if (req.mode === "navigate") {
-        const home = await cache.match(new URL("./", self.location).pathname);
+        const home = await cache.match(new URL("./", self.location).pathname, { ignoreVary: true });
         if (home) return home;
       }
       throw err;
