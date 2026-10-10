@@ -11,9 +11,11 @@
  *   brand: { en, zh },                   // header title per UI language
  *   ask(item, uiLang) -> { ask, sub },   // prompt text (UI chrome)
  *   say(item) -> string,                 // spoken target, e.g. "B ... ball"
+ *   sayKey(item) -> string,              // clip key for say(item) (audio/<lang>/<key>.mp3)
  *   praise(item) -> string,              // spoken on a correct tap
+ *   praiseKey(item) -> string,           // clip key for praise(item)
  *   line(item) -> string,                // text under the celebration
- *   doneSay: string,                     // spoken on the All done screen
+ *   doneSay: string,                     // spoken on the All done screen (clip key "all-done")
  *   symClass: string,                    // extra class for the big symbol
  * }
  */
@@ -30,7 +32,7 @@
     window.LLGame = { state: st, cfg: cfg, ROUNDS: ROUNDS, STEP_UP: STEP_UP, STEP_DOWN: STEP_DOWN };
 
     function T(en, zh) { return lang === "en" ? en : zh; }
-    function sayTarget() { if (st.target) LL.speak(cfg.say(st.target), cfg.speechLang); }
+    function sayTarget() { if (st.target) LL.say(cfg.sayKey(st.target), cfg.say(st.target), cfg.speechLang); }
 
     function paint() {
       $("homeLabel").textContent = T("Home", "首頁");
@@ -85,7 +87,8 @@
         grid.appendChild(b);
       });
       paint();
-      setTimeout(sayTarget, 280);
+      var r = st.round;
+      setTimeout(function () { if (r === st.round && !st.locked) sayTarget(); }, 280); // not if already tapped
     }
 
     function onPick(it, el) {
@@ -102,7 +105,7 @@
         celebrate.classList.add("show");
         paint();
         var r = st.round;
-        LL.afterPraise(cfg.praise(st.target), cfg.speechLang, function () {
+        LL.afterPraise(cfg.praiseKey(st.target), cfg.praise(st.target), cfg.speechLang, function () {
           if (r !== st.round) return;
           if (st.inSession >= ROUNDS) showDone(); else newRound();
         }, 1600);
@@ -124,13 +127,12 @@
       for (var i = 0; i < ROUNDS; i++) s += '<span style="animation-delay:' + (i * 0.12) + 's">' + star(true) + "</span>";
       $("doneStars").innerHTML = s;
       done.classList.add("show");
-      LL.speak(cfg.doneSay, cfg.speechLang);
+      LL.say("all-done", cfg.doneSay, cfg.speechLang);
     }
 
     $("again").addEventListener("click", newSession);
     $("speak").addEventListener("click", sayTarget);
     LL.bindLangToggle(function (l) { lang = l; paint(); });
-    LL.onFirstTouch(sayTarget);
     newSession();
   };
 })();

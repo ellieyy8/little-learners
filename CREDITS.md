@@ -63,6 +63,14 @@ The ABC and ㄅㄆㄇ photos in `abc/images/` and `bopomofo/images/` were croppe
 padding added where needed), resized to 800×600 and saved as JPEG quality 80. The two Colors
 photos are used unchanged; the card crops them to 4:3 on screen.
 
+## Voices (`audio/`)
+
+The spoken clips were generated with Microsoft Edge's neural text-to-speech (via the
+open-source `edge-tts` tool): English voice **Jenny** (`en-US-JennyNeural`) and Taiwan
+Mandarin voice **HsiaoChen** (`zh-TW-HsiaoChenNeural`), rate -10%. They are synthetic
+voices, not recordings of real people. `audio/silence.mp3` is a short silent clip made with
+ffmpeg.
+
 ## Icons and shapes
 
 The app icons (`icons/`) were drawn with Python/PIL and the solid shapes and stars are

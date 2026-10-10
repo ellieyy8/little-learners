@@ -11,8 +11,38 @@ Small, offline-capable toddler learning games (English + 繁體中文), as a sta
   `letters.js`/`letters.css` are the engine for the ABC and ㄅㄆㄇ games)
 - `sw.js`: service worker (generated). It precaches every app file so the site works offline after one visit.
 
-No external requests at runtime: no CDNs, web fonts or analytics. Speech uses the
-device's built-in voices (Web Speech API, `en-US` / `zh-TW`).
+No external requests at runtime: no CDNs, web fonts or analytics.
+
+## Voices (pre-recorded clips)
+
+Everything the games say is a bundled MP3 in `audio/<lang>/<key>.mp3` (`en` = English,
+`zh` = Taiwan Mandarin), made with Microsoft Edge neural voices: **en-US-JennyNeural** and
+**zh-TW-HsiaoChenNeural**, at rate -10%. The clips are precached by the service worker, so
+they work offline and sound the same on every device. If a clip is missing or can't load,
+the game falls back to the device's own voice (Web Speech API).
+
+Each game asks for a phrase by a stable key with `LL.say(key, text, lang)`, and lists
+everything it can say with `LL.definePhrases(...)`. Key names are `colors-<item>-tap/-yes`,
+`shapes-<shape>-tap/-yes`, `abc-<letter>[-snd][-yes]`, `zy-<symbol>[-word][-yes]`,
+`all-done`, `great-job`.
+
+iPad/iPhone only allow sound after a tap, so the very first prompt on a page may stay silent
+until the child taps the screen. That first tap plays it (or, if the tap is on a card, the
+card's answer).
+
+### Regenerate the audio (after changing or adding any spoken text)
+
+    # 1. collect every phrase from the games into audio/phrases.json (needs Playwright + Chromium)
+    python tools/collect_phrases.py
+    # 2. make missing/changed clips, delete unused ones (needs edge-tts and internet)
+    /workspace/.venv-tts/bin/python tools/build_audio.py      # add --force to redo all
+    # 3. precache them
+    python3 tools/build_sw.py
+
+`audio/phrases.json` is the list of texts. You can also edit it by hand, but the next
+`collect_phrases.py` run rewrites it from the games. `audio/build-lock.json` records which
+text/voice/rate each clip was made from, so only changed clips are regenerated. Voices and
+rate are set at the top of `tools/build_audio.py`.
 
 ## Run locally
 
@@ -40,9 +70,9 @@ The EN/中文 toggle changes only the on-screen text. ABC speech is always Engli
 
 ### Please test the speech on the iPad
 
-Text-to-speech voices are not good at saying a lone letter sound or a lone 注音 symbol, so
-both games start with the safe setting. Test on the iPad (sound on, not in silent mode) and
-change the setting if needed.
+The games play the pre-recorded clips (see "Voices" above). Clips exist for both forms of
+every phrase, so flipping a setting needs no new audio. Test on the iPad and change the
+setting if needed. (The notes below about the device voice only matter if a clip is missing.)
 
 **ABC: letter sounds (`abc/index.html`, `USE_LETTER_SOUNDS`)**
 
@@ -67,6 +97,7 @@ change the setting if needed.
   - If only some are wrong, give those symbols `speakSymbol: false` (e.g. on ㄈ).
 
 After editing either file, run `python3 tools/build_sw.py` so the installed app picks up the
-change.
+change. If you changed a `name`, `phoneme`, word or fallback text, regenerate the audio first
+(see "Regenerate the audio").
 
 Photo credits: see `CREDITS.md`.

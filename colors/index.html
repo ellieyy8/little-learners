@@ -120,8 +120,9 @@
     const yay = document.getElementById("yay");
     const yaySub = document.getElementById("yaySub");
 
-    function phrase(item) {
-      if (lang === "en") {
+    function phrase(item, L) {
+      L = L || lang;
+      if (L === "en") {
         return {
           ask: "Tap the " + item.colorEn + " " + item.en,
           sub: item.colorZh + "的" + item.zh,
@@ -138,12 +139,20 @@
         winLine: item.colorZh + "的" + item.zh + " · " + item.colorEn + " " + item.en,
       };
     }
-
-    function speak(text) { LL.speak(text, lang); }
+    // Clip keys: audio/<lang>/colors-<id>-tap.mp3 and colors-<id>-yes.mp3
+    LL.definePhrases(() => {
+      const out = [];
+      for (const L of ["en", "zh"]) for (const it of ITEMS) {
+        const p = phrase(it, L);
+        out.push({ key: "colors-" + it.id + "-tap", lang: L, text: p.speak });
+        out.push({ key: "colors-" + it.id + "-yes", lang: L, text: p.win });
+      }
+      return out;
+    });
 
     function speakPrompt() {
       if (!target) return;
-      speak(phrase(target).speak);
+      LL.say("colors-" + target.id + "-tap", phrase(target).speak, lang);
     }
 
     function updatePrompt() {
@@ -185,7 +194,8 @@
         grid.appendChild(b);
       });
       updatePrompt();
-      setTimeout(speakPrompt, 280);
+      const r = round;
+      setTimeout(() => { if (r === round && !locked) speakPrompt(); }, 280); // not if already tapped
     }
 
     function onPick(item, el) {
@@ -197,7 +207,7 @@
         yaySub.textContent = p.winLine;
         celebrate.classList.add("show");
         const r = round;
-        LL.afterPraise(p.win, lang, () => { if (r === round) newRound(); }, 1300);
+        LL.afterPraise("colors-" + target.id + "-yes", p.win, lang, () => { if (r === round) newRound(); }, 1300);
       } else {
         el.classList.add("wrong");
         setTimeout(() => el.classList.remove("wrong"), 350);
@@ -206,7 +216,6 @@
 
     LL.bindLangToggle(l => { lang = l; if (target) newRound(); });
     document.getElementById("speak").addEventListener("click", speakPrompt);
-    LL.onFirstTouch(speakPrompt);
 
     newRound();
   </script>

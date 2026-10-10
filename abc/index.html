@@ -91,11 +91,28 @@
     var q = new URLSearchParams(location.search).get("sounds");
     if (q === "1" || q === "0") USE_LETTER_SOUNDS = q === "1";
 
-    function spoken(l) {
-      var useSound = (typeof l.usePhoneme === "boolean" ? l.usePhoneme : USE_LETTER_SOUNDS) && l.phoneme;
-      return useSound ? l.name + " ... " + l.phoneme + ", " + l.phoneme + ", " + l.word
-                      : l.name + " ... " + l.word;
+    function useSound(l) { return !!((typeof l.usePhoneme === "boolean" ? l.usePhoneme : USE_LETTER_SOUNDS) && l.phoneme); }
+    function spokenAs(l, snd) {
+      return snd ? l.name + " ... " + l.phoneme + ", " + l.phoneme + ", " + l.word
+                 : l.name + " ... " + l.word;
     }
+    function spoken(l) { return spokenAs(l, useSound(l)); }
+    // Clip keys (audio/en/...): abc-<id> = "B ... ball", abc-<id>-snd = "B ... buh, buh, ball",
+    // plus "-yes" versions for the praise, and all-done.
+    function keyOf(l) { return "abc-" + l.id + (useSound(l) ? "-snd" : ""); }
+    LL.definePhrases(function () {
+      var out = [{ key: "all-done", lang: "en", text: DONE_SAY }];
+      LETTERS.forEach(function (l) {
+        [false, true].forEach(function (snd) {
+          if (snd && !l.phoneme) return;
+          var k = "abc-" + l.id + (snd ? "-snd" : "");
+          out.push({ key: k, lang: "en", text: spokenAs(l, snd) });
+          out.push({ key: k + "-yes", lang: "en", text: "Yes! " + spokenAs(l, snd) });
+        });
+      });
+      return out;
+    });
+    var DONE_SAY = "All done! Great job!";
     window.ABC_SPOKEN = spoken; // used by the tests
 
     LL.letterGame({
@@ -108,9 +125,11 @@
         return ui === "en" ? { ask: "Find " + U, sub: "找 " + U } : { ask: "找 " + U, sub: "Find " + U };
       },
       say: spoken,
+      sayKey: keyOf,
       praise: function (l) { return "Yes! " + spoken(l); },
+      praiseKey: function (l) { return keyOf(l) + "-yes"; },
       line: function (l) { return l.big + " · " + l.word; },
-      doneSay: "All done! Great job!",
+      doneSay: DONE_SAY,
     });
   </script>
 </body>

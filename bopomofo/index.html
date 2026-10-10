@@ -93,7 +93,23 @@
     if (q === "1" || q === "0") SPEAK_SYMBOL = q === "1";
 
     function useSymbol(s) { return typeof s.speakSymbol === "boolean" ? s.speakSymbol : SPEAK_SYMBOL; }
-    function spoken(s) { return useSymbol(s) ? s.big + "，" + s.word : s.fallback; }
+    function spokenAs(s, sym) { return sym ? s.big + "，" + s.word : s.fallback; }
+    function spoken(s) { return spokenAs(s, useSymbol(s)); }
+    // Clip keys (audio/zh/...): zy-<id> = "ㄅ，杯子", zy-<id>-word = "杯子",
+    // plus "-yes" versions for the praise, and all-done.
+    function keyOf(s) { return "zy-" + s.id + (useSymbol(s) ? "" : "-word"); }
+    var DONE_SAY = "全部完成！好棒！";
+    LL.definePhrases(function () {
+      var out = [{ key: "all-done", lang: "zh", text: DONE_SAY }];
+      SYMBOLS.forEach(function (s) {
+        [true, false].forEach(function (sym) {
+          var k = "zy-" + s.id + (sym ? "" : "-word");
+          out.push({ key: k, lang: "zh", text: spokenAs(s, sym) });
+          out.push({ key: k + "-yes", lang: "zh", text: "對了！" + spokenAs(s, sym) });
+        });
+      });
+      return out;
+    });
     window.BPMF_SPOKEN = spoken; // used by the tests
 
     LL.letterGame({
@@ -106,9 +122,11 @@
         return ui === "en" ? { ask: "Find " + s.big, sub: "找 " + s.big } : { ask: "找 " + s.big, sub: "Find " + s.big };
       },
       say: spoken,
+      sayKey: keyOf,
       praise: function (s) { return "對了！" + spoken(s); },
+      praiseKey: function (s) { return keyOf(s) + "-yes"; },
       line: function (s) { return s.big + " · " + s.word + " · " + s.en; },
-      doneSay: "全部完成！好棒！",
+      doneSay: DONE_SAY,
     });
   </script>
 </body>

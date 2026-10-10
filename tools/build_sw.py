@@ -2,13 +2,13 @@
 """Regenerate sw.js with the full precache list and a content-hash version.
 
 Run from anywhere after adding/changing files:  python3 tools/build_sw.py
-Every app file (html, css, js, images, icons, manifest) is precached so the
+Every app file (html, css, js, images, icons, audio clips, manifest) is precached so the
 site works fully offline after one online visit.
 """
 import hashlib, os, json
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INCLUDE_EXT = {".html", ".css", ".js", ".webmanifest", ".png", ".jpg", ".jpeg", ".svg", ".webp"}
+INCLUDE_EXT = {".html", ".css", ".js", ".webmanifest", ".png", ".jpg", ".jpeg", ".svg", ".webp", ".mp3"}
 SKIP_DIRS = {".git", "tools", "node_modules"}
 SKIP_FILES = {"sw.js"}
 

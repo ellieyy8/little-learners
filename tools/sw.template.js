@@ -33,6 +33,31 @@ self.addEventListener("activate", (event) => {
   })());
 });
 
+// Safari's <audio> asks for byte ranges ("Range: bytes=0-1") and will not play a clip
+// unless it gets a proper 206 Partial Content answer, so serve ranges from the cache.
+async function rangeResponse(res, range) {
+  const m = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+  const blob = await res.blob();
+  const size = blob.size;
+  if (!m) return new Response(blob, { status: 200, headers: res.headers });
+  let start, end;
+  if (m[1] === "") { start = Math.max(0, size - Number(m[2])); end = size - 1; }   // "bytes=-500"
+  else { start = Number(m[1]); end = m[2] === "" ? size - 1 : Math.min(Number(m[2]), size - 1); }
+  if (start >= size || start > end) {
+    return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + size } });
+  }
+  return new Response(blob.slice(start, end + 1), {
+    status: 206,
+    statusText: "Partial Content",
+    headers: {
+      "Content-Type": res.headers.get("Content-Type") || "audio/mpeg",
+      "Content-Range": "bytes " + start + "-" + end + "/" + size,
+      "Content-Length": String(end - start + 1),
+      "Accept-Ranges": "bytes",
+    },
+  });
+}
+
 // Cache-first: everything is precached; anything new is fetched and kept.
 self.addEventListener("fetch", (event) => {
   const req = event.request;
@@ -43,7 +68,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const hit = await cache.match(req, { ignoreSearch: true });
-    if (hit) return hit;
+    if (hit) {
+      const range = req.headers.get("range");
+      return range ? rangeResponse(hit, range) : hit;
+    }
     if (req.mode === "navigate") {
       if (url.pathname.endsWith("/")) {
         const idx = await cache.match(url.pathname + "index.html");
@@ -55,7 +83,9 @@ self.addEventListener("fetch", (event) => {
     }
     try {
       const res = await fetch(req);
-      if (res.ok && res.type === "basic") cache.put(req, (await clean(res.clone())));
+      if (res.status === 200 && res.type === "basic" && !req.headers.get("range")) {
+        cache.put(req, await clean(res.clone())).catch(() => {});
+      }
       return res;
     } catch (err) {
       if (req.mode === "navigate") {
